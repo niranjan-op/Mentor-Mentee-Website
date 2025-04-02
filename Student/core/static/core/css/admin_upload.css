@@ -1,0 +1,107 @@
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #c3e6cb;
+}
+
+.error-msg {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+}
+
+.warning-message {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ffeeba;
+}
+
+.recent-uploads {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.recent-uploads h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.uploads-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.uploads-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.processed-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+.processed-true {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.processed-false {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.current-upload {
+    background-color: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+.current-upload h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.upload-btn:hover {
+    background-color: #3367d6;
+}
+
+.login-options {
+    display: flex;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.login-options a {
+    margin-right: 15px;
+}
+
+.logout-link {
+    color: #e53935;
+}

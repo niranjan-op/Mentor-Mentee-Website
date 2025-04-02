@@ -3,8 +3,10 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .forms import StudentLoginForm, MentorLoginForm
+from .forms import StudentLoginForm, MentorLoginForm, AdminLoginForm
 from django.contrib import messages
+from django.contrib.auth.models import User
+from core.models import Student, Mentor
 
 def home(request):
     """Home page with links to different login options"""
@@ -19,9 +21,11 @@ def student_login(request):
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                # TODO: Add verification that user is a student
-                auth_login(request, user)
-                return redirect('core:home')
+                if Student.objects.filter(user=user).exists():
+                    auth_login(request, user)
+                    return redirect('core:home')
+                else:
+                    messages.error(request, "User is not linked to a Student model")
             else:
                 messages.error(request, "Invalid credentials")
         else:
@@ -40,9 +44,11 @@ def mentor_login(request):
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                # TODO: Add verification that user is a mentor
-                auth_login(request, user)
-                return redirect('core:home')
+                if Mentor.objects.filter(user=user).exists():
+                    auth_login(request, user)
+                    return redirect('core:home')
+                else:
+                    messages.error(request, "User is not linked to a Mentor model")
             else:
                 messages.error(request, "Invalid credentials")
         else:
@@ -62,8 +68,8 @@ def admin_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None and user.is_staff:
                 auth_login(request, user)
-                # Redirect to admin dashboard or Django admin
-                return redirect('admin:index')
+                # Redirect to CSV upload page instead of Django admin
+                return redirect('core:upload_csv')
             else:
                 messages.error(request, "Invalid credentials or insufficient permissions")
         else:
@@ -76,5 +82,7 @@ def admin_login(request):
 @login_required
 def logout_view(request):
     """Logout view"""
-    auth_logout(request)
-    return redirect('home')
+    if request.method == 'POST':
+        auth_logout(request)
+        return redirect('home')
+    return render(request, 'Logout/logout.html')
