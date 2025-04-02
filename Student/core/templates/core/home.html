@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mentor-Mentee System - Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'core/css/home.css' %}">
 </head>
 <body>
     <header>
@@ -17,8 +19,17 @@
         <h2>Welcome, {{ user.username }}</h2>
         
         <div class="dashboard">
-            <!-- Dashboard content will go here -->
             <p>You have successfully logged in.</p>
+            
+            <div class="dashboard-links">
+                {% if user.student_profile %}
+                    <a href="{% url 'core:student_dashboard' %}" class="dashboard-button">Go to Student Dashboard</a>
+                {% endif %}
+                
+                {% if user.mentor_profile %}
+                    <a href="{% url 'core:mentor_dashboard' %}" class="dashboard-button">Go to Mentor Dashboard</a>
+                {% endif %}
+            </div>
         </div>
     </main>
     

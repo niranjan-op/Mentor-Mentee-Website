@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/login.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Mentor Dashboard</h1>
+            <div class="nav-links">
+                <a href="{% url 'core:home' %}" class="btn">Home</a>
+                <a href="{% url 'logout' %}" class="btn" style="background-color: #f44336;">Logout</a>
+            </div>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="success-message">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="mentor-info">
+            <h2>Mentor Information</h2>
+            <p><strong>Name:</strong> {{ mentor.name }}</p>
+            <p><strong>Mentor ID:</strong> {{ mentor.mentor_id }}</p>
+            <p><strong>Email:</strong> {{ mentor.email }}</p>
+        </div>
+        
+        <div class="students-section">
+            <h2>Assigned Students</h2>
+            <p>This is a private dashboard that only mentors can access. Here you can view and manage the students assigned to you.</p>
+            
+            {% if students %}
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Branch</th>
+                        <th>Division</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.roll_number }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.email_id }}</td>
+                        <td>{{ student.branch }}</td>
+                        <td>{{ student.division }}</td>
+                        <td>
+                            <a href="#" class="btn" style="padding: 5px 10px; font-size: 12px;">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No students assigned yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
