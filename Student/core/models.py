@@ -2,8 +2,8 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from .validators import validate_roll_no, validate_email, validate_dob
 from django.contrib.auth.models import User
+import os
 
-# Create your models here.
 class Branch(models.Model):
     name = models.CharField(max_length=100)
     def __str__(self):
@@ -39,13 +39,15 @@ class Student(models.Model):
     name = models.CharField(max_length=100, help_text="Enter your full name in the format 'First Middle Last'")
     email_id = models.EmailField(max_length=100, validators=[validate_email])
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='student_profile')
-    address = models.TextField(max_length=500, help_text="Enter your full address")
-    phone_no_student = models.CharField(max_length=12, help_text="Enter your phone number")
-    phone_no_mother = models.CharField(max_length=12, help_text="Enter your mother's phone number")
-    phone_no_father = models.CharField(max_length=12, help_text="Enter your father's phone number")
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='students')
-    division = models.ForeignKey(Division, on_delete=models.CASCADE, related_name='students')
-    dob = models.DateField(validators=[validate_dob],help_text="Enter your date of birth in the format YYYY-MM-DD")
+    
+    # Make these fields optional by adding null=True, blank=True
+    address = models.TextField(max_length=500, help_text="Enter your full address", null=True, blank=True)
+    phone_no_student = models.CharField(max_length=12, help_text="Enter your phone number", null=True, blank=True)
+    phone_no_mother = models.CharField(max_length=12, help_text="Enter your mother's phone number", null=True, blank=True)
+    phone_no_father = models.CharField(max_length=12, help_text="Enter your father's phone number", null=True, blank=True)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='students', null=True, blank=True)
+    division = models.ForeignKey(Division, on_delete=models.CASCADE, related_name='students', null=True, blank=True)
+    dob = models.DateField(validators=[validate_dob], help_text="Enter your date of birth in the format YYYY-MM-DD", null=True, blank=True)
     
     # Academic records
     marks_10th = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, 
@@ -65,7 +67,7 @@ class Student(models.Model):
     internship_status = models.CharField(max_length=20, choices=INTERNSHIP_STATUS_CHOICES, default='NOT_STARTED')
     internship_company = models.CharField(max_length=100, blank=True, null=True)
     internship_role = models.CharField(max_length=100, blank=True, null=True)
-    mentor = models.ForeignKey(Mentor, on_delete=models.CASCADE, related_name='students')
+    mentor_id = models.ForeignKey(Mentor, on_delete=models.CASCADE, related_name='students', null=True, blank=True)
     
     # Personal development tracking
     goals = models.TextField(blank=True, help_text="Student's academic and career goals")
@@ -80,6 +82,7 @@ class Student(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
+    semester = models.PositiveIntegerField()
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='subjects')
     subject_code = models.CharField(max_length=10, unique=True)
     is_elective = models.BooleanField(default=False)
@@ -163,30 +166,26 @@ class Project(models.Model):
     def __str__(self):
         return self.title  # Simplified
 
-def csv_file_path(instance, filename):
-    """
-    Custom function to determine upload path and filename for CSV files
-    """
-    # This preserves the original filename while still using the upload_to directory
-    return f'csv_files/{filename}'
-
 class CSVInput(models.Model):
-    file = models.FileField(upload_to=csv_file_path)
-    original_filename = models.CharField(max_length=255, blank=True)
+    file_name = models.CharField(max_length=255)  # Store the original filename
+    csv_content = models.TextField()  # Store the CSV content directly in the database
     uploaded_at = models.DateTimeField(auto_now_add=True)
     processed = models.BooleanField(default=False)
-    
-    def save(self, *args, **kwargs):
-        # Store the original filename when first created
-        if not self.id and hasattr(self.file, 'name'):
-            self.original_filename = self.file.name
-        super().save(*args, **kwargs)
+    # Track users created/updated from this CSV file
+    associated_users = models.ManyToManyField(User, blank=True, related_name='source_csv_files')
     
     def __str__(self):
-        filename = self.original_filename or self.file.name.split('/')[-1]
-        return f"CSV Upload {self.id} - {filename}"
+        return f"CSV Upload {self.id} - {self.uploaded_at.strftime('%Y-%m-%d %H:%M')}"
     
     class Meta:
         verbose_name = "CSV Upload"
         verbose_name_plural = "CSV Uploads"
         ordering = ['-uploaded_at']
+class CSVInput_Mentors(models.Model):
+    file_name=models.CharField(max_length=255)
+    csv_content=models.TextField()
+    uploaded_at=models.DateTimeField(auto_now_add=True)
+    processed=models.BooleanField(default=False)
+    associated_users=models.ManyToManyField(User, blank=True, related_name='source_csv_files_mentors')
+    def __str__(self):
+        return f"CSV Upload {self.id} - {self.uploaded_at.strftime('%Y-%m-%d %H:%M')}" 

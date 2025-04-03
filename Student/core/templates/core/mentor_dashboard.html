@@ -46,9 +46,6 @@
                         <th>Roll Number</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Branch</th>
-                        <th>Division</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,11 +54,6 @@
                         <td>{{ student.roll_number }}</td>
                         <td>{{ student.name }}</td>
                         <td>{{ student.email_id }}</td>
-                        <td>{{ student.branch }}</td>
-                        <td>{{ student.division }}</td>
-                        <td>
-                            <a href="#" class="btn" style="padding: 5px 10px; font-size: 12px;">View Details</a>
-                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

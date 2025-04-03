@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="{% static 'core/css/admin_upload.css' %}">
 </head> 
 <body>
-    <div class="login-container">
-        <h1>Admin CSV Upload</h1>
+    <div class="container">
+        <h1>Admin CSV Upload Panel</h1>
         
         {% if messages %}
         <div class="messages">
@@ -26,55 +26,121 @@
         </div>
         {% endif %}
         
-        <form method="POST" enctype="multipart/form-data" action="{% url 'core:upload_csv' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="id_csv_file">{{ form.csv_file.label }}</label>
-                <div class="file-upload-wrapper">
-                    {{ form.csv_file }}
-                    {% if form.csv_file.help_text %}
-                        <div class="file-upload-info">{{ form.csv_file.help_text }}</div>
-                    {% endif %}
-                </div>
-                {% if form.csv_file.errors %}
-                    <div class="error-msg">
-                        {{ form.csv_file.errors }}
+        <div class="upload-sections">
+            <div class="upload-section student-section">
+                <h2>Student CSV Upload</h2>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'core:upload_csv' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_csv_file">{{ form.csv_file.label }}</label>
+                        <div class="file-upload-wrapper">
+                            {{ form.csv_file }}
+                            {% if form.csv_file.help_text %}
+                                <div class="file-upload-info">{{ form.csv_file.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        {% if form.csv_file.errors %}
+                            <div class="error-msg">
+                                {{ form.csv_file.errors }}
+                            </div>
+                        {% endif %}
+                    </div> 
+                    <div class="form-group">
+                        <button type="submit" class="btn upload-btn">Upload Students</button>
                     </div>
+                </form>
+                
+                {% if recent_upload %}
+                <div class="current-upload">
+                    <h3>Current Student Upload</h3>
+                    <div class="file-info">
+                        <div class="file-details">
+                            <p class="file-name">{{ recent_upload.file_name }}</p>
+                            <p class="upload-date">Uploaded: {{ recent_upload.uploaded_at|date:"Y-m-d H:i" }}</p>
+                            <p class="status">
+                                Status: 
+                                <span class="status-tag {% if recent_upload.processed %}processed{% else %}pending{% endif %}">
+                                    {% if recent_upload.processed %}Processed{% else %}Pending{% endif %}
+                                </span>
+                            </p>
+                            <p class="associated-users">
+                                Associated Users: <span class="user-count">{{ recent_upload.associated_users.count }}</span>
+                                <small class="warning-text">(Will be deleted when file is deleted)</small>
+                            </p>
+                        </div>
+                        <div class="file-actions">
+                            <a href="{% url 'core:delete_csv' recent_upload.id %}" 
+                               class="delete-btn" 
+                               onclick="return confirm('Are you sure you want to delete this file? All associated student user accounts ({{ recent_upload.associated_users.count }}) will also be deleted.');">
+                                Delete File
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-files-message">
+                    <p>No student files have been uploaded yet.</p>
+                </div>
                 {% endif %}
-            </div> 
-            <div class="form-group">
-                <button type="submit" class="btn upload-btn">Upload</button>
             </div>
-        </form>
-        
-        {% if recent_upload %}
-        <div class="current-upload">
-            <h2>Current Uploaded File</h2>
-            <div class="file-info">
-                <div class="file-details">
-                    <p class="file-name">{{ recent_upload.file.name|cut:"csv_files/" }}</p>
-                    <p class="upload-date">Uploaded: {{ recent_upload.uploaded_at|date:"Y-m-d H:i" }}</p>
-                    <p class="status">
-                        Status: 
-                        <span class="status-tag {% if recent_upload.processed %}processed{% else %}pending{% endif %}">
-                            {% if recent_upload.processed %}Processed{% else %}Pending{% endif %}
-                        </span>
-                    </p>
+            
+            <div class="upload-section mentor-section">
+                <h2>Mentor CSV Upload</h2>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'core:upload_csv_mentors' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_csv_file">{{ mentor_form.csv_file.label }}</label>
+                        <div class="file-upload-wrapper">
+                            {{ mentor_form.csv_file }}
+                            {% if mentor_form.csv_file.help_text %}
+                                <div class="file-upload-info">{{ mentor_form.csv_file.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        {% if mentor_form.csv_file.errors %}
+                            <div class="error-msg">
+                                {{ mentor_form.csv_file.errors }}
+                            </div>
+                        {% endif %}
+                    </div> 
+                    <div class="form-group">
+                        <button type="submit" class="btn upload-btn mentor-btn">Upload Mentors</button>
+                    </div>
+                </form>
+                
+                {% if mentor_upload %}
+                <div class="current-upload">
+                    <h3>Current Mentor Upload</h3>
+                    <div class="file-info">
+                        <div class="file-details">
+                            <p class="file-name">{{ mentor_upload.file_name }}</p>
+                            <p class="upload-date">Uploaded: {{ mentor_upload.uploaded_at|date:"Y-m-d H:i" }}</p>
+                            <p class="status">
+                                Status: 
+                                <span class="status-tag {% if mentor_upload.processed %}processed{% else %}pending{% endif %}">
+                                    {% if mentor_upload.processed %}Processed{% else %}Pending{% endif %}
+                                </span>
+                            </p>
+                            <p class="associated-users">
+                                Associated Users: <span class="user-count">{{ mentor_upload.associated_users.count }}</span>
+                                <small class="warning-text">(Will be deleted when file is deleted)</small>
+                            </p>
+                        </div>
+                        <div class="file-actions">
+                            <a href="{% url 'core:delete_csv_mentors' mentor_upload.id %}" 
+                               class="delete-btn" 
+                               onclick="return confirm('Are you sure you want to delete this file? All associated mentor user accounts ({{ mentor_upload.associated_users.count }}) will also be deleted.');">
+                                Delete File
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="file-actions">
-                    <a href="{% url 'core:delete_csv' recent_upload.id %}" 
-                       class="delete-btn" 
-                       onclick="return confirm('Are you sure you want to delete this file?');">
-                        Delete File
-                    </a>
+                {% else %}
+                <div class="no-files-message">
+                    <p>No mentor files have been uploaded yet.</p>
                 </div>
+                {% endif %}
             </div>
         </div>
-        {% else %}
-        <div class="no-files-message">
-            <p>No files have been uploaded yet. Use the form above to upload a CSV file.</p>
-        </div>
-        {% endif %}
         
         <div class="login-options">
             <a href="{% url 'core:home' %}">Back to Home</a>

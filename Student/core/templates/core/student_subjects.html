@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Subjects and Marks</title>
+    <link rel="stylesheet" href="{% static 'styles/login.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+    <style>
+        .subject-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .subject-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .semester-tag {
+            background-color: #e0e0e0;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .marks-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        .submit-row {
+            grid-column: span 2;
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        .add-subject-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        
+        .add-subject-btn:hover {
+            background-color: #388e3c;
+        }
+        
+        .no-subjects {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>{% if is_self %}My Subjects{% else %}{{ student.name }}'s Subjects{% endif %}</h1>
+            <div class="nav-links">
+                <a href="{% url 'core:home' %}" class="btn">Home</a>
+                {% if is_self %}
+                    <a href="{% url 'core:student_dashboard' %}" class="btn">My Dashboard</a>
+                {% elif user.is_staff or user.mentor_profile %}
+                    <a href="{% url 'core:student_detail' student.roll_number %}" class="btn">Student Profile</a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="btn" style="background-color: #f44336;">Logout</a>
+            </div>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="success-message">{{ message }}</div>
+                {% elif message.tags == 'error' %}
+                    <div class="error-message">{{ message }}</div>
+                {% elif message.tags == 'info' %}
+                    <div class="info-message">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="student-info">
+            <h2>Student Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Name:</span> {{ student.name }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Roll Number:</span> {{ student.roll_number }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span> {{ student.email_id }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Branch:</span> {{ student.branch|default:"Not specified" }}
+                </div>
+            </div>
+        </div>
+        
+        {% if user.is_staff or user.mentor_profile %}
+        <a href="{% url 'core:add_student_subject' student.roll_number %}" class="add-subject-btn">
+            Add New Subject
+        </a>
+        {% endif %}
+        
+        {% if student_subjects %}
+            {% for student_subject in student_subjects %}
+                <div class="subject-card">
+                    <div class="subject-header">
+                        <div class="subject-title">{{ student_subject.subject.name }} ({{ student_subject.subject.subject_code }})</div>
+                        <div class="semester-tag">Semester {{ student_subject.semester }}</div>
+                    </div>
+                    
+                    {% if student_subject.marks_obtained %}
+                    <div class="current-marks">
+                        <p><strong>Current Total Marks:</strong> {{ student_subject.marks_obtained }}/{{ student_subject.max_marks }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if user.is_staff or user.mentor_profile %}
+                    <form method="post" class="marks-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="subject_id" value="{{ student_subject.id }}">
+                        
+                        {% with form=subject_forms|get_item:student_subject.id %}
+                            <div class="form-group">
+                                <label for="{{ form.marks_obtained.id_for_label }}">{{ form.marks_obtained.label }}</label>
+                                {{ form.marks_obtained }}
+                                {% if form.marks_obtained.help_text %}
+                                <div class="help-text">{{ form.marks_obtained.help_text }}</div>
+                                {% endif %}
+                                {% if form.marks_obtained.errors %}
+                                <div class="error-text">{{ form.marks_obtained.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.ia1_marks.id_for_label }}">{{ form.ia1_marks.label }}</label>
+                                {{ form.ia1_marks }}
+                                {% if form.ia1_marks.help_text %}
+                                <div class="help-text">{{ form.ia1_marks.help_text }}</div>
+                                {% endif %}
+                                {% if form.ia1_marks.errors %}
+                                <div class="error-text">{{ form.ia1_marks.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.ia2_marks.id_for_label }}">{{ form.ia2_marks.label }}</label>
+                                {{ form.ia2_marks }}
+                                {% if form.ia2_marks.help_text %}
+                                <div class="help-text">{{ form.ia2_marks.help_text }}</div>
+                                {% endif %}
+                                {% if form.ia2_marks.errors %}
+                                <div class="error-text">{{ form.ia2_marks.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.end_exam_marks.id_for_label }}">{{ form.end_exam_marks.label }}</label>
+                                {{ form.end_exam_marks }}
+                                {% if form.end_exam_marks.help_text %}
+                                <div class="help-text">{{ form.end_exam_marks.help_text }}</div>
+                                {% endif %}
+                                {% if form.end_exam_marks.errors %}
+                                <div class="error-text">{{ form.end_exam_marks.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="submit-row">
+                                <button type="submit" class="btn">Update Marks</button>
+                            </div>
+                        {% endwith %}
+                    </form>
+                    {% else %}
+                    <div class="marks-details">
+                        <h3>Assessment Breakdown</h3>
+                        <table class="marks-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Assessment</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Marks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ia in student_subject.internal_assessments.all %}
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">{{ ia.get_assessment_type_display }}</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">
+                                        {% if ia.marks_obtained is not None %}
+                                            {{ ia.marks_obtained }}/{{ ia.max_marks }}
+                                        {% else %}
+                                            Not graded yet
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">End Semester Exam</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">
+                                        {% if student_subject.end_semester_exam.marks_obtained is not None %}
+                                            {{ student_subject.end_semester_exam.marks_obtained }}/{{ student_subject.end_semester_exam.max_marks }}
+                                        {% else %}
+                                            Not graded yet
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">Total</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">
+                                        {% if student_subject.marks_obtained is not None %}
+                                            {{ student_subject.marks_obtained }}/{{ student_subject.max_marks }}
+                                        {% else %}
+                                            Not graded yet
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-subjects">
+                <h3>No subjects found</h3>
+                <p>This student does not have any subjects registered yet.</p>
+                {% if user.is_staff or user.mentor_profile %}
+                <p>Click the "Add New Subject" button above to add subjects for this student.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Template filter for accessing dictionary items by key -->
+    <script>
+        // Adding a Django custom template filter equivalent for JavaScript
+        // This is just for demonstration - this code doesn't actually run but shows what we need
+        // In a real implementation, you would create a Django template filter
+    </script>
+</body>
+</html>
