@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout</title>
+    <link rel="stylesheet" href="/static/styles/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Logout Confirmation</h1>
+        <p>Are you sure you want to log out?</p>
+        
+        <div class="form-group">
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn">Yes, log me out</button>
+            </form>
+        </div>
+        
+        <div class="form-group">
+            <a href="{% url 'core:home' %}" class="btn" style="background-color: #ccc; color: #333;">No, take me back</a>
+        </div>
+    </div>
+</body>
+</html>

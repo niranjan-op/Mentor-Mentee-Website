@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/login.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Student Dashboard</h1>
+            <div class="nav-links">
+                <a href="{% url 'core:home' %}" class="btn">Home</a>
+                <a href="{% url 'logout' %}" class="btn" style="background-color: #f44336;">Logout</a>
+            </div>
+        </div>
+        <a href="{% url 'core:student_form' %}">Edit student details</a>
+        <div class="student-info">
+            <h2>Student Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Name:</span> {{ student.name }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Roll Number:</span> {{ student.roll_number }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span> {{ student.email_id }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Branch:</span> {{ student.branch }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Division:</span> {{ student.division }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Mentor:</span> 
+                    {% if mentor_info %}
+                        {{ mentor_info.name }} ({{ mentor_info.id }})
+                    {% else %}
+                        Not assigned
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="academic-info">
+            <h2>Academic Information</h2>
+            <p>This is a private dashboard that only students can access. Here you can view your academic records, semester results, and track your progress.</p>
+            
+            <!-- Placeholder for academic results -->
+            <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+                <h3>Semester Results</h3>
+                <p>Your semester results will be displayed here when available.</p>
+            </div>
+        </div>
+
+        <!-- Debug information section -->
+        <div class="debug-info" style="margin-top:20px; padding:10px; background-color:#f8f9fa; border:1px solid #ddd; border-radius:4px;">
+            <h3>Debug Information</h3>
+            <p>Student roll number: {{ student.roll_number }}</p>
+            <p>Mentor ID field value: {{ student.mentor_id_id }}</p>
+            {% if mentor_info %}
+            <p>Found mentor: {{ mentor_info.name }} ({{ mentor_info.id }})</p>
+            {% else %}
+            <p>No mentor information found</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
