@@ -1,0 +1,53 @@
+{% load static %}
+
+{% block title %}Student Registration Form{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/student_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="student-form-container">
+    <div class="form-header">
+        <h2>Student Registration Form</h2>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="form-fields">
+            {{ form.non_field_errors }}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="error-text">
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+                
+                {% if field.name == 'internship_status' %}
+                <div class="help-text">
+                    Note: If your status is Shortlisted, Accepted, or Completed, you must provide company and role information.
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="btn-submit">Submit</button>
+    </form>
+</div>
+{% endblock %}

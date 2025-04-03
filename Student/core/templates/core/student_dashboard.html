@@ -17,7 +17,7 @@
                 <a href="{% url 'logout' %}" class="btn" style="background-color: #f44336;">Logout</a>
             </div>
         </div>
-        
+        <a href="{% url 'core:student_form' %}">Edit student details</a>
         <div class="student-info">
             <h2>Student Information</h2>
             <div class="info-grid">
@@ -37,7 +37,12 @@
                     <span class="info-label">Division:</span> {{ student.division }}
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Mentor:</span> {{ student.mentor.name }}
+                    <span class="info-label">Mentor:</span> 
+                    {% if mentor_info %}
+                        {{ mentor_info.name }} ({{ mentor_info.id }})
+                    {% else %}
+                        Not assigned
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -51,6 +56,18 @@
                 <h3>Semester Results</h3>
                 <p>Your semester results will be displayed here when available.</p>
             </div>
+        </div>
+
+        <!-- Debug information section -->
+        <div class="debug-info" style="margin-top:20px; padding:10px; background-color:#f8f9fa; border:1px solid #ddd; border-radius:4px;">
+            <h3>Debug Information</h3>
+            <p>Student roll number: {{ student.roll_number }}</p>
+            <p>Mentor ID field value: {{ student.mentor_id_id }}</p>
+            {% if mentor_info %}
+            <p>Found mentor: {{ mentor_info.name }} ({{ mentor_info.id }})</p>
+            {% else %}
+            <p>No mentor information found</p>
+            {% endif %}
         </div>
     </div>
 </body>

@@ -21,11 +21,27 @@ def student_login(request):
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                if Student.objects.filter(user=user).exists():
+                # Check if student record exists and is linked to the user
+                student_linked = Student.objects.filter(user=user).exists()
+                
+                if student_linked:
+                    # User is already linked to a student record
                     auth_login(request, user)
                     return redirect('core:home')
                 else:
-                    messages.error(request, "User is not linked to a Student model")
+                    # Check if a student record exists with this roll number
+                    student_record = Student.objects.filter(roll_number=username).first()
+                    
+                    if student_record:
+                        # Student record exists but is not linked to the user
+                        # Link the student record to this user
+                        student_record.user = user
+                        student_record.save()
+                        messages.success(request, "Your account has been linked to your student record.")
+                        auth_login(request, user)
+                        return redirect('core:home')
+                    else:
+                        messages.error(request, "No student record found with your roll number. Please contact the administrator.")
             else:
                 messages.error(request, "Invalid credentials")
         else:
