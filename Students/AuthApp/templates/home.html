@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor-Mentee System</title>
+    <link rel="stylesheet" href="/static/styles/login.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Mentor-Mentee System</h1>
+        <div class="login-options">
+            <div class="login-card">
+                <h2>Student Login</h2>
+                <p>Login with your roll number and password</p>
+                <a href="{% url 'student_login' %}" class="btn">Student Login</a>
+            </div>
+            
+            <div class="login-card">
+                <h2>Mentor Login</h2>
+                <p>Login with your mentor ID and password</p>
+                <a href="{% url 'mentor_login' %}" class="btn">Mentor Login</a>
+            </div>
+            
+            <div class="login-card">
+                <h2>Admin Login</h2>
+                <p>Login to the administration panel</p>
+                <a href="{% url 'admin_login' %}" class="btn">Admin Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

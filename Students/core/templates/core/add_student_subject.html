@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Subject to Student</title>
+    <link rel="stylesheet" href="{% static 'styles/login.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Add Subject for {{ student.name }}</h1>
+            <div class="nav-links">
+                <a href="{% url 'core:home' %}" class="btn">Home</a>
+                <a href="{% url 'core:student_subjects' student.roll_number %}" class="btn">Back to Subjects</a>
+                <a href="{% url 'logout' %}" class="btn" style="background-color: #f44336;">Logout</a>
+            </div>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="success-message">{{ message }}</div>
+                {% elif message.tags == 'error' %}
+                    <div class="error-message">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="student-info">
+            <h2>Student Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Name:</span> {{ student.name }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Roll Number:</span> {{ student.roll_number }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span> {{ student.email_id }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Branch:</span> {{ student.branch|default:"Not specified" }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-container" style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h2>Add New Subject</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select name="subject" id="subject" class="form-control" required>
+                        <option value="">-- Select Subject --</option>
+                        {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.subject_code }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="semester">Semester</label>
+                    <select name="semester" id="semester" class="form-control" required>
+                        <option value="">-- Select Semester --</option>
+                        {% for i in "12345678"|make_list %}
+                            <option value="{{ i }}">Semester {{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="is_elective">
+                        <input type="checkbox" name="is_elective" id="is_elective"> Is this an elective subject?
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn" style="background-color: #4caf50;">Add Subject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
